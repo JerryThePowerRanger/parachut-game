@@ -16,11 +16,11 @@ function start(){
                 {id: 'parachuter' , src: '../assets/sprite-sheet-08.png'},
                 {id: 'plane' , src: '../assets/sprite-sheet-09.png'},
 			]);
-		}
+            init();
+		} 
     
     function init(){
         stage = new createjs.Stage(document.getElementById('canvas'));
-        preload();
     }	
     
     function drawAsset(x, y, scale_x, scale_y, preload_id){
@@ -34,7 +34,7 @@ function start(){
         stage.update();
     }
         
-    init();
+    preload();
 }
 
 window.addEventListener('load', start, false);
