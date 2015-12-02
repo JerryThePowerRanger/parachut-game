@@ -20,13 +20,20 @@ function start(){
     
     function init(){
         stage = new createjs.Stage(document.getElementById('canvas'));
+        preload();
     }	
     
-    function drawLandingPlattform(x,y){
+    function drawAsset(x, y, scale_x, scale_y, preload_id){
+        var asset = new createjs.Bitmap(queue.getResult(preload_id));
+        asset.scaleX = scale_x;
+        asset.scaleY = scale_y;
+        asset.x = x;
+        asset.y = y;
         
+        stage.addChild(asset);
+        stage.update();
     }
-    
-    
+        
     init();
 }
 
