@@ -6,8 +6,8 @@ function start(){
     var movement_x;
     var movement_y;
     
-    var movement_x_original;
-    var movement_y_original;
+    var delta_movement_x = 0;
+    var delta_movement_y = 0;
     
     function preload(){
         queue = new createjs.LoadQueue();
@@ -73,27 +73,27 @@ function start(){
     function moveParachuter(target_x, target_y){
         var vector_times = calculateVector(movement_x, movement_y);
         if(parachuter.x < 800){
-            parachuter.x += vector_times.time_x;
+            parachuter.x += vector_times.time_x + delta_movement_x;
         }
         
         if(parachuter.y < 500){
-            parachuter.y += vector_times.time_y;
+            parachuter.y += vector_times.time_y + delta_movement_y;
         }
     }
     
     function movementParachuter(e){
-        
         switch(e.keyCode){
             case 37:
-                if(movement_x - 0.2 === movement_x_original - 0.2){
-                    movement_x -= 0.2;
-                }
+                delta_movement_x = -0.2;
             break;
             case 38:
+                delta_movement_y = -0.1;
             break;
             case 39:
+                delta_movement_x = 0.2;
             break;
             case 40:
+                delta_movement_y = 0.1;
             break;
         }
     }
