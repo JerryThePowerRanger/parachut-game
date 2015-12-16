@@ -42,11 +42,7 @@ function start(){
     }
     
     function drawParachuter(x, y, scale_x, scale_y){
-       // var asset = new createjs.Bitmap(queue.getResult('parachuter'));
-        var asset = new createjs.Shape();
-        asset.graphics
-            .beginFill('yellow')
-            .drawRect(x,y, 20, 20);
+        var asset = new createjs.Bitmap(queue.getResult('parachuter'));
         asset.scaleX = scale_x;
         asset.scaleY = scale_y;
         asset.x = x;
@@ -100,15 +96,17 @@ function start(){
     
     function init(){
         stage = new createjs.Stage(document.getElementById('canvas'));
+                drawParachuter(20,20,0.2,0.2);
+
+        
         drawAsset(50,100,0.5,0.5,'cloud_1');
         drawAsset(200,100,0.5,0.5,'cloud_2');
         drawAsset(300,200,0.2,0.2,'thunder_cloud');
-        drawAsset(100,200,0.5,0.5,'coin');
-        drawAsset(300,300,0.5,0.5,'coin');
-        drawAsset(500,300,0.5,0.5,'coin');
+        drawAsset(100,200,0.3,0.3,'coin');
+        drawAsset(300,300,0.3,0.3,'coin');
+        drawAsset(500,300,0.3,0.3,'coin');
         drawAsset(600,800,0.5,0.5,'plattform');
         
-        drawParachuter(20,20,1,1);
        // var x = createTicker
         
         for(var i = 0; i < assets.length; i++){
