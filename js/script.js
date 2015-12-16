@@ -10,7 +10,7 @@ function start(){
     var delta_movement_y = 0;
     
     function preload(){
-        queue = new createjs.LoadQueue();
+        queue = new createjs.LoadQueue(false);
         queue.addEventListener('complete', init);
         queue.loadManifest([
             {id: 'cloud_1' , src: '../assets/sprite-sheet-01.png'},
@@ -26,16 +26,16 @@ function start(){
     }
     
     function drawAsset(x, y, scale_x, scale_y, preload_id){
-        //var asset = new createjs.Bitmap(queue.getResult(preload_id));
-        /*asset.scaleX = scale_x;
+        var asset = new createjs.Bitmap(queue.getResult(preload_id));
+        asset.scaleX = scale_x;
         asset.scaleY = scale_y;
         asset.x = x;
         asset.y = y;
-        assets.push(asset);*/
-        var asset = new createjs.Shape();
+        assets.push(asset);
+       /* var asset = new createjs.Shape();
         asset.graphics
 		  .beginFill('red')
-		  .drawRect(x, y, 50, 50);
+		  .drawRect(x, y, 50, 50);*/
         assets.push(asset);
         stage.addChild(asset);
         stage.update();
@@ -102,7 +102,7 @@ function start(){
         stage = new createjs.Stage(document.getElementById('canvas'));
         drawAsset(50,100,0.5,0.5,'cloud_1');
         drawAsset(200,100,0.5,0.5,'cloud_2');
-        drawAsset(300,200,0.5,0.5,'thunder_cloud');
+        drawAsset(300,200,0.2,0.2,'thunder_cloud');
         drawAsset(100,200,0.5,0.5,'coin');
         drawAsset(300,300,0.5,0.5,'coin');
         drawAsset(500,300,0.5,0.5,'coin');
