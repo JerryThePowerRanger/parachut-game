@@ -9,6 +9,8 @@ function start(){
     var delta_movement_x = 0;
     var delta_movement_y = 0;
     
+    var score = 0;
+    
     function preload(){
         queue = new createjs.LoadQueue(false);
         queue.addEventListener('complete', init);
@@ -22,6 +24,7 @@ function start(){
             {id: 'zeppelin_right' , src: '../assets/sprite-sheet-07.png'},
             {id: 'parachuter' , src: '../assets/sprite-sheet-08.png'},
             {id: 'plane' , src: '../assets/sprite-sheet-09.png'},
+            {id: 'burnt_parachuter' , src: '../assets/sprite-sheet-10.png'}
         ]);
     }
     
@@ -68,6 +71,15 @@ function start(){
         };
     }
     
+    function isColliding(a, b) {
+        return !(
+            ((a.y + a.height) < (b.y)) ||
+            (a.y > (b.y + b.height)) ||
+            ((a.x + a.width) < b.x) ||
+            (a.x > (b.x + b.width))
+        );
+    }
+    
     function getAsset(asset_id){
         for(var i = 0; i < assets.length; i++){
             if(assets[i].asset_id === asset_id){
@@ -83,13 +95,21 @@ function start(){
             parachuter.x += vector_times.time_x + delta_movement_x;
         }
         
-        if(parachuter.y < (landing_plattform.y - landing_plattform.height)){
+        if(parachuter.y <= (landing_plattform.y - landing_plattform.height) || (parachuter.x < landing_plattform.x || parachuter.x >                 (landing_plattform.height + landing_plattform.x))){
             parachuter.y += vector_times.time_y + delta_movement_y;
         }
         
-        if(parachuter.y === (landing_plattform.y - landing_plattform.height)) 
-            && parachuter.x === (landing_plattform.x)){
-            console.log('wuhu');  
+        
+        if((parachuter.y + parachuter.height) > (landing_plattform.y)){
+            if(parachuter.x > landing_plattform.x && parachuter.x < (landing_plattform.x + landing_plattform.width)){
+                // Gewonnen
+                
+                
+            }else{
+                // Verloren
+                
+                
+            }
         }
         
         
@@ -114,7 +134,7 @@ function start(){
     function movementParachuter(e){
         switch(e.keyCode){
             case 37:
-                delta_movement_x = checkMovement(delta_movement_x, -0.2);
+                delta_movement_x = checkMovement(delta_movement_x, -0.1);
             break;
             case 38:
                 delta_movement_y = checkMovement(delta_movement_y, -0.1);
@@ -128,11 +148,57 @@ function start(){
         }
     }
     
+    function fallParachuter(){
+        getAsset('burnt_parachuter').y += 2
+    }
+    
+    function loadSound(){
+        createjs.Sound.registerSound('../assets/coin-sound.mp3', 'coin_sound');
+    }
+    
+    function playSound(soundId){
+        createjs.Sound.play(soundId);
+    }
+    
+    function checkCollision(){
+        for(var i = 0; i < assets.length; i++){
+            if(isColliding(parachuter, assets[i])){
+                switch(assets[i].asset_id){
+                    case 'thunder_cloud':
+                        parachuter.visible = false;
+                        createjs.Ticker.addEventListener('tick', fallParachuter);
+                        drawAsset(parachuter.x, parachuter.y, parachuter.scaleX, parachuter.scaleY, 'burnt_parachuter');
+                    case 'zeppelin_left':
+                    case 'zeppelin_right':
+                        createjs.Ticker.removeEventListener('tick', moveParachuter);
+                        createjs.Ticker.removeEventListener('tick', checkCollision);
+                        window.removeEventListener('keydown', movementParachuter);
+                    break;
+                    case 'coin':
+                        assets[i].visible = false;
+                        assets.splice(i,1);
+                        score++;
+                        playSound('coin_sound');
+                    break;
+                    default:
+                        
+                    break;    
+                }
+
+            }
+        }
+    }
+    
+    
+    
     /*
     * Initialisierungsfunktion des Spiels
     */
     function init(){
         stage = new createjs.Stage(document.getElementById('canvas'));
+        
+        loadSound();
+        
         drawParachuter(20,20,0.2,0.2);
         drawAsset(50,100,0.5,0.5,'cloud_1');
         drawAsset(200,100,0.5,0.5,'cloud_2');
@@ -141,12 +207,13 @@ function start(){
         drawAsset(300,300,0.3,0.3,'coin');
         drawAsset(500,300,0.3,0.3,'coin');
         drawAsset(700,540,0.3,0.3,'plattform');
+        drawAsset(-235,-60,0.3,0.3,'plane')
         
-       // var x = createTicker
+        
         
         for(var i = 0; i < assets.length; i++){
             var time = 10000 * (Math.random() + 1);
-            if(assets[i].asset_id !== 'plattform'){
+            if(assets[i].asset_id !== 'plattform' && assets[i].asset_id !== 'burnt_parachuter'){
                 createjs.Tween.get(assets[i], {loop: true})
                     .to({x:500}, time, createjs.Ease.getPowInOut(2))
                     .to({x:0}, time, createjs.Ease.getPowInOut(2));
@@ -162,6 +229,7 @@ function start(){
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addEventListener('tick', stage);
         createjs.Ticker.addEventListener('tick', moveParachuter);
+        createjs.Ticker.addEventListener('tick', checkCollision);
         window.addEventListener('keydown', movementParachuter);
     }	
     
