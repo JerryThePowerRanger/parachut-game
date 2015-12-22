@@ -35,7 +35,7 @@ function start(){
         asset.x = x;
         asset.y = y;
         asset.asset_id = preload_id;
-        var bounds = parachuter.getTransformedBounds();
+        var bounds = asset.getTransformedBounds();
         asset.height = bounds.height;
         asset.width = bounds.width;
         assets.push(asset);
@@ -58,16 +58,10 @@ function start(){
         
     }
     
-     function calculateVector(x, y){
-        var time_x;
-        var time_y;
-        
-        time_x = x * 0.1;
-        time_y = y * 0.1;
-        
+     function calculateVector(x, y){       
         return {
-            time_x: time_x,
-            time_y: time_y
+            time_x: x * 0.1,
+            time_y: y * 0.1
         };
     }
     
@@ -88,10 +82,10 @@ function start(){
         }
     }
     
-    function moveParachuter(target_x, target_y){
+    function moveParachuter(){
         var vector_times = calculateVector(movement_x, movement_y);
         var landing_plattform = getAsset('plattform');
-        if(parachuter.x < 800){
+        if(parachuter.x < 1000){
             parachuter.x += vector_times.time_x + delta_movement_x;
         }
         
@@ -102,11 +96,15 @@ function start(){
         
         if((parachuter.y + parachuter.height) > (landing_plattform.y)){
             if(parachuter.x > landing_plattform.x && parachuter.x < (landing_plattform.x + landing_plattform.width)){
-                // Gewonnen
+                createjs.Ticker.removeEventListener('tick', moveParachuter);
+                createjs.Ticker.removeEventListener('tick', checkCollision);
+                window.removeEventListener('keydown', movementParachuter);
                 
                 
             }else{
-                // Verloren
+                createjs.Ticker.removeEventListener('tick', moveParachuter);
+                createjs.Ticker.removeEventListener('tick', checkCollision);
+                window.removeEventListener('keydown', movementParachuter);
                 
                 
             }
@@ -154,10 +152,39 @@ function start(){
     
     function loadSound(){
         createjs.Sound.registerSound('../assets/coin-sound.mp3', 'coin_sound');
+        createjs.Sound.volume = 0.5;
     }
     
     function playSound(soundId){
         createjs.Sound.play(soundId);
+    }
+    
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+    
+    function moveObjects(){
+        for(var i = 0; i < assets.length; i++){
+            var current_asset = assets[i];
+            var time = getRandomArbitrary(10000,20000);
+            var start_point = current_asset.x;
+            var end_point = Math.random() > 0.5 ? 800 : 0;
+            if(current_asset.asset_id !== 'plattform' && current_asset.asset_id !== 'burnt_parachuter' && current_asset.asset_id !==                'plane'){
+                createjs.Tween.get(current_asset, {loop: true})
+                .to({x: end_point}, 
+                    time, 
+                    createjs.Ease.getPowInOut(2))
+                .to({x: start_point},
+                   time,
+                   createjs.Ease.getPowInOut(2));
+            }else if(current_asset.asset_id === 'plane'){
+                createjs.Tween.get(current_asset)
+                .to({x: (1000 + current_asset.width)},
+                   time);
+            }
+
+            
+        }
     }
     
     function checkCollision(){
@@ -189,6 +216,14 @@ function start(){
         }
     }
     
+    function placeAssets(placed_assets){
+        for(var i = 0; i < placed_assets.length; i++){
+            var current_asset = placed_assets[i];
+            var start_x = getRandomArbitrary(100 , 900);
+            var start_y = getRandomArbitrary(100, 400);
+            drawAsset(start_x, start_y, current_asset.scale_x, current_asset.scale_y, current_asset.asset_id);
+        }
+    }
     
     
     /*
@@ -198,33 +233,55 @@ function start(){
         stage = new createjs.Stage(document.getElementById('canvas'));
         
         loadSound();
-        
-        drawParachuter(20,20,0.2,0.2);
-        drawAsset(50,100,0.5,0.5,'cloud_1');
-        drawAsset(200,100,0.5,0.5,'cloud_2');
-        drawAsset(300,200,0.2,0.2,'thunder_cloud');
-        drawAsset(100,200,0.3,0.3,'coin');
-        drawAsset(300,300,0.3,0.3,'coin');
-        drawAsset(500,300,0.3,0.3,'coin');
+              
         drawAsset(700,540,0.3,0.3,'plattform');
-        drawAsset(-235,-60,0.3,0.3,'plane')
+        drawAsset(-235,-60,0.3,0.3,'plane');
+        drawParachuter(20,20,0.2,0.2);
         
-        
-        
-        for(var i = 0; i < assets.length; i++){
-            var time = 10000 * (Math.random() + 1);
-            if(assets[i].asset_id !== 'plattform' && assets[i].asset_id !== 'burnt_parachuter'){
-                createjs.Tween.get(assets[i], {loop: true})
-                    .to({x:500}, time, createjs.Ease.getPowInOut(2))
-                    .to({x:0}, time, createjs.Ease.getPowInOut(2));
-            }
-
+        placeAssets([
+            {
+                asset_id: 'cloud_1',
+                scale_x: getRandomArbitrary(0.3, 0.4),
+                scale_y: getRandomArbitrary(0.3, 0.4)
+            },
+            {
+                asset_id: 'cloud_2',
+                scale_x: getRandomArbitrary(0.3, 0.4),
+                scale_y: getRandomArbitrary(0.3, 0.4)
+            },
+            {
+                asset_id: 'thunder_cloud',
+                scale_x: getRandomArbitrary(0.2, 0.3),
+                scale_y: getRandomArbitrary(0.2, 0.3)
+            },
+            {
+                asset_id: 'coin',
+                scale_x: 0.3,
+                scale_y: 0.3
+            },
+            {
+                asset_id: 'coin',
+                scale_x: 0.3,
+                scale_y: 0.3
+            },
+            {
+                asset_id: 'coin',
+                scale_x: 0.3,
+                scale_y: 0.3
+            },
+            {
+                asset_id: 'coin',
+                scale_x: 0.3,
+                scale_y: 0.3
+            },
             
-        }
+        ]);
         
-        movement_x = 2;
+        moveObjects();
+        
+        movement_x = 4;
         movement_y = 2;
-        moveParachuter(800, 500);
+        moveParachuter();
         
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addEventListener('tick', stage);
