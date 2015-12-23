@@ -6,11 +6,14 @@ function start(){
     var movement_x;
     var movement_y;
     
+    var wind_strength = 0;
+    
     var delta_movement_x = 0;
     var delta_movement_y = 0;
     
     var score = 0;
     
+   
     function preload(){
         queue = new createjs.LoadQueue(false);
         queue.addEventListener('complete', init);
@@ -87,7 +90,7 @@ function start(){
         var vector_times = calculateVector(movement_x, movement_y);
         var landing_plattform = getAsset('plattform');
         if(parachuter.x < 1000){
-            parachuter.x += vector_times.time_x + delta_movement_x;
+            parachuter.x += vector_times.time_x + delta_movement_x + wind_strength;
         }
         
         if(parachuter.y <= (landing_plattform.y - landing_plattform.height) || (parachuter.x < landing_plattform.x || parachuter.x >                 (landing_plattform.height + landing_plattform.x))){
@@ -168,6 +171,13 @@ function start(){
         return Math.random() * (max - min) + min;
     }
     
+    function generateWind(){
+        return calculateVector(
+            Math.floor(getRandomArbitrary(1,10)),
+            0
+        );
+    }
+    
     function moveObjects(){
         for(var i = 0; i < assets.length; i++){
             var current_asset = assets[i];
@@ -236,7 +246,7 @@ function start(){
     */
     function init(){
         stage = new createjs.Stage(document.getElementById('canvas'));
-                      
+        wind_strength = generateWind().time_x;
         drawAsset(700,540,0.3,0.3,'plattform');
         drawAsset(-235,-60,0.3,0.3,'plane');
         drawParachuter(20,20,0.2,0.2);
@@ -254,8 +264,9 @@ function start(){
             },
             {
                 asset_id: 'thunder_cloud',
-                scale_x: getRandomArbitrary(0.2, 0.3),
-                scale_y: getRandomArbitrary(0.2, 0.3)
+                scale: ,
+                scale_x: 0.25,
+                scale_y: 0.25
             },
             {
                 asset_id: 'coin',
@@ -282,7 +293,7 @@ function start(){
         
         moveObjects();
         
-        movement_x = 4;
+        movement_x = 2;
         movement_y = 2;
         moveParachuter();
         
