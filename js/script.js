@@ -26,6 +26,7 @@ function start(){
             {id: 'plane' , src: '../assets/sprite-sheet-09.png'},
             {id: 'burnt_parachuter' , src: '../assets/sprite-sheet-10.png'}
         ]);
+        loadSound();
     }
     
     function drawAsset(x, y, scale_x, scale_y, preload_id){
@@ -96,17 +97,19 @@ function start(){
         
         if((parachuter.y + parachuter.height) > (landing_plattform.y)){
             if(parachuter.x > landing_plattform.x && parachuter.x < (landing_plattform.x + landing_plattform.width)){
+                console.log('Gewonnen');
                 createjs.Ticker.removeEventListener('tick', moveParachuter);
                 createjs.Ticker.removeEventListener('tick', checkCollision);
                 window.removeEventListener('keydown', movementParachuter);
                 
                 
             }else{
+                console.log('Verloren');
                 createjs.Ticker.removeEventListener('tick', moveParachuter);
                 createjs.Ticker.removeEventListener('tick', checkCollision);
                 window.removeEventListener('keydown', movementParachuter);
                 
-                
+                stage.clear();
             }
         }
         
@@ -144,6 +147,8 @@ function start(){
                 delta_movement_y = checkMovement(delta_movement_y, 0.1);
             break;
         }
+        parachuter.rotation = delta_movement_x * 75;
+
     }
     
     function fallParachuter(){
@@ -231,9 +236,7 @@ function start(){
     */
     function init(){
         stage = new createjs.Stage(document.getElementById('canvas'));
-        
-        loadSound();
-              
+                      
         drawAsset(700,540,0.3,0.3,'plattform');
         drawAsset(-235,-60,0.3,0.3,'plane');
         drawParachuter(20,20,0.2,0.2);
